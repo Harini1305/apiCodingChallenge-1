@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.dto.AuthRequest;
+import com.example.demo.entity.User;
 import com.example.demo.security.JwtUtil;
+import com.example.demo.service.UserService;
 
 @RestController
 @RequestMapping("/auth")
@@ -12,13 +14,17 @@ import com.example.demo.security.JwtUtil;
 public class AuthController {
 
     private final JwtUtil jwtUtil;
+    private final UserService userService;
+
+    @PostMapping("/register")
+    public User register(@RequestBody User user) {
+        return userService.register(user);
+    }
 
     @PostMapping("/login")
     public String login(@RequestBody AuthRequest request) {
 
-        if ("admin".equals(request.getUsername()) &&
-            "admin".equals(request.getPassword())) {
-
+        if (userService.validateUser(request.getUsername(), request.getPassword())) {
             return jwtUtil.generateToken(request.getUsername());
         }
 
